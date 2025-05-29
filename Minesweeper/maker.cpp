@@ -1,4 +1,5 @@
 #include "maker.h"
+#include <random>
 
 Maker::Maker() { }
 Maker::~Maker() { }
@@ -9,6 +10,52 @@ bool Maker::init() {
 
 	gSpriteClips = new SDL_Rect[BUTTON_SPRITE_TOTAL];
 	gButtons = new LButton[mWindow.TOTAL_BUTTONS];
+
+	///////////////////////////////////////////////////////////
+	// Set random bombs positions
+	int* arr = new int[mWindow.TOTAL_BUTTONS], *indices = new int[mWindow.TOTAL_BUTTONS];
+	for (int i = 0; i < mWindow.TOTAL_BUTTONS; ++i) {
+		arr[i] = 0;
+		indices[i] = i;
+	}
+
+	random_device rd;
+	mt19937 gen(rd());
+	shuffle(indices, indices + mWindow.TOTAL_BUTTONS, gen);
+
+	for (int i = 0; i < mWindow.BOMBS; ++i) {
+		arr[indices[i]] = -1; // Set bomb
+	}
+
+	for (int i = 0; i < mWindow.TOTAL_BUTTONS; ++i) {
+		if (arr[i] == -1) continue;
+		int x = i % mWindow.GAME_WIDTH;
+		int y = i / mWindow.GAME_WIDTH;
+
+		bool up = y - 1 >= 0, down = y + 1 < mWindow.GAME_HEIGHT;
+		bool left = x - 1 >= 0, right = x + 1 < mWindow.GAME_WIDTH;
+
+		if (up) {
+			if (arr[i - mWindow.GAME_WIDTH] == -1) arr[i]++;
+			if (left && arr[i - mWindow.GAME_WIDTH - 1] == -1) arr[i]++;
+			if (right && arr[i - mWindow.GAME_WIDTH + 1] == -1) arr[i]++;
+		}
+		if (down) {
+			if (arr[i + mWindow.GAME_WIDTH] == -1) arr[i]++;
+			if (left && arr[i + mWindow.GAME_WIDTH - 1] == -1) arr[i]++;
+			if (right && arr[i + mWindow.GAME_WIDTH + 1] == -1) arr[i]++;
+		}
+		if (left && arr[i - 1] == -1) arr[i]++;
+		if (right && arr[i + 1] == -1) arr[i]++;
+	}
+
+	for (int i = 0; i < mWindow.TOTAL_BUTTONS; ++i) {
+		gButtons[i].setState(arr[i]);
+	}
+
+	delete[] indices;
+	delete[] arr;
+	////////////////////////////////////////////////////////////
 
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -62,20 +109,19 @@ bool Maker::loadMedia() {
 	}
 	else {
 		//Set sprites
-		for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
-			gSpriteClips[i].x = i * 12;
-			gSpriteClips[i].y = 0;
-			gSpriteClips[i].w = mWindow.BUTTON_WIDTH;
-			gSpriteClips[i].h = mWindow.BUTTON_HEIGHT;
+		for (int i = 0; i < 2; ++i) { // BUTTON_SPRITE_TOTAL
+			for (int j = 0; j < 9; ++j) {
+				gSpriteClips[i * 9 + j].x = j * 16;
+				gSpriteClips[i * 9 + j].y = i * 16;
+				gSpriteClips[i * 9 + j].w = mWindow.BUTTON_WIDTH;
+				gSpriteClips[i * 9 + j].h = mWindow.BUTTON_HEIGHT;
+			}
 		}
 
-		//Set buttons in corners
-		//gButtons[0].setPosition(0, 0);
-		//gButtons[1].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, 0);
-		//gButtons[2].setPosition(0, SCREEN_HEIGHT - BUTTON_HEIGHT);
-		//gButtons[3].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT);
-		for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
-			gButtons[i].setPosition(0, i * 12);
+		for (int i = 0; i < mWindow.GAME_HEIGHT; ++i) {
+			for (int j = 0; j < mWindow.GAME_WIDTH; ++j) {
+				gButtons[i * mWindow.GAME_HEIGHT + j].setPosition(j * 16 + 1, i * 16 + 1);
+			}
 		}
 	}
 
@@ -133,21 +179,25 @@ void Maker::run() {
 				//Handle events on queue
 				while (SDL_PollEvent(&e) != 0)
 				{
-					//User requests quit
-					if (e.type == SDL_QUIT)
-					{
+					switch (e.type) {
+					case SDL_QUIT:
 						quit = true;
-					}
+						break;
+					case SDL_MOUSEBUTTONDOWN:
+						int x, y;
+						SDL_GetMouseState(&x, &y);
+						x /= CELL_SIZE;
+						y /= CELL_SIZE;
 
-					//Handle button events
-					for (int i = 0; i < mWindow.TOTAL_BUTTONS; ++i)
-					{
-						gButtons[i].handleEvent(&e);
+						if (x >= 0 && y >= 0 && x < mWindow.GAME_WIDTH && y < mWindow.GAME_HEIGHT) {
+							gButtons[y * mWindow.GAME_HEIGHT + x].handleEvent(&e);
+						}
+						break;
 					}
 				}
 
 				//Clear screen
-				SDL_SetRenderDrawColor(mWindow.gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+				SDL_SetRenderDrawColor(mWindow.gRenderer, 0x8C, 0x8C, 0x8C, 0xFF); // For a gray background
 				SDL_RenderClear(mWindow.gRenderer);
 
 				//Render buttons

@@ -10,8 +10,15 @@ public:
 	//Initializes internal variables
 	LButton();
 
-	//Sets top left position
+	//Sets position
 	void setPosition(int x, int y);
+
+	//Sets Current Sprite
+	void setCurrentSprite(LButtonSprite newSprite);
+
+	void setState(int newState);
+
+	void setPressed(bool newPressed);
 
 	//Handles mouse event
 	void handleEvent(SDL_Event* e);
@@ -26,11 +33,17 @@ public:
 	LButtonSprite getCurrentSprite();
 
 private:
-	//Top left position
+	//Position
 	SDL_Point mPosition;
 
-	//Currently used global sprite
+	//Currently sprite
 	LButtonSprite mCurrentSprite;
+
+	//Real state: -1 = bomb, 0-8 = number
+	int state;
+
+	//Is the button pressed
+	bool pressed;
 };
 
 #endif
