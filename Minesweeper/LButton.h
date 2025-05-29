@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LBUTTON_H
+#define LBUTTON_H
+
 #include "utils.h"
 
 //The mouse button
@@ -14,8 +16,14 @@ public:
 	//Handles mouse event
 	void handleEvent(SDL_Event* e);
 
-	//Shows button sprite
-	void render();
+	////Shows button sprite
+	//void render();
+
+	//Gets button position
+	SDL_Point getPosition();
+
+	//Gets button sprite
+	LButtonSprite getCurrentSprite();
 
 private:
 	//Top left position
@@ -24,3 +32,5 @@ private:
 	//Currently used global sprite
 	LButtonSprite mCurrentSprite;
 };
+
+#endif

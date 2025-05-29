@@ -1,5 +1,5 @@
 #include "LButton.h"
-#include "LTexture.h"
+//#include "LTexture.h"
 
 LButton::LButton() {
 	mPosition.x = 0;
@@ -28,7 +28,7 @@ void LButton::handleEvent(SDL_Event* e) {
 			inside = false;
 		}
 		//Mouse is right of the button
-		else if (x > mPosition.x + BUTTON_WIDTH) {
+		else if (x > mPosition.x + mWindow.BUTTON_WIDTH) {
 			inside = false;
 		}
 		//Mouse above the button
@@ -36,7 +36,7 @@ void LButton::handleEvent(SDL_Event* e) {
 			inside = false;
 		}
 		//Mouse below the button
-		else if (y > mPosition.y + BUTTON_HEIGHT) {
+		else if (y > mPosition.y + mWindow.BUTTON_HEIGHT) {
 			inside = false;
 		}
 
@@ -64,7 +64,10 @@ void LButton::handleEvent(SDL_Event* e) {
 	}
 }
 
-void LButton::render() {
-	//Show current button sprite
-	gButtonSpriteSheetTexture.render(mPosition.x, mPosition.y, &gSpriteClips[mCurrentSprite]);
+SDL_Point LButton::getPosition() {
+	return mPosition;
+}
+
+LButtonSprite LButton::getCurrentSprite() {
+	return mCurrentSprite;
 }

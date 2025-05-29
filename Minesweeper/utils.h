@@ -1,16 +1,11 @@
-#pragma once
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
 
 using namespace std;
-
-int SCREEN_WIDTH = 0;
-int SCREEN_HEIGHT = 0;
-
-int BUTTON_WIDTH = 0;
-int BUTTON_HEIGHT = 0;
-const int TOTAL_BUTTONS = 4;
 
 enum LButtonSprite
 {
@@ -21,27 +16,18 @@ enum LButtonSprite
 	BUTTON_SPRITE_TOTAL = 4
 };
 
-class LTexture;
-class LButton;
+struct LWindow {
+	SDL_Window* gWindow = NULL;
+	SDL_Renderer* gRenderer = NULL;
 
-//Starts up SDL and creates window
-bool init();
+	int SCREEN_WIDTH = 640;
+	int SCREEN_HEIGHT = 480;
 
-//Loads media
-bool loadMedia();
+	int BUTTON_WIDTH = 12;
+	int BUTTON_HEIGHT = 12;
+	int TOTAL_BUTTONS = 4;
+};
 
-//Frees media and shuts down SDL
-void close();
+extern LWindow mWindow;
 
-//The window we'll be rendering to
-SDL_Window* gWindow = NULL;
-
-//The window renderer
-SDL_Renderer* gRenderer = NULL;
-
-//Mouse button sprites
-SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
-LTexture gButtonSpriteSheetTexture;
-
-//Buttons objects
-LButton gButtons[TOTAL_BUTTONS];
+#endif
