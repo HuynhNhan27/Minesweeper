@@ -32,7 +32,7 @@ enum LButtonSprite
 	BUTTON_SPRITE_BOMB = 11,
 	BUTTON_SPRITE_FLAG = 12,
 	BUTTON_SPRITE_EXPLOSION = 14,
-	BUTTON_SPRITE_TOTAL = 18 // 18 sprites for buttons (need to be loaded)
+	BUTTON_SPRITE_TOTAL = 54 // 18 sprites for buttons (need to be loaded)
 };
 
 enum LSize {
@@ -45,9 +45,6 @@ struct LWindow {
 
 	int SCREEN_WIDTH;
 	int SCREEN_HEIGHT;
-
-	int BUTTON_WIDTH;
-	int BUTTON_HEIGHT;
 
 	int GAME_WIDTH;
 	int GAME_HEIGHT;

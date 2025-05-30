@@ -21,7 +21,7 @@ public:
 	void setPressed(bool newPressed);
 
 	//Handles mouse event
-	void handleEvent(SDL_Event* e);
+	int handleEvent(SDL_Event* e);
 
 	////Shows button sprite
 	//void render();
@@ -31,6 +31,9 @@ public:
 
 	//Gets button sprite
 	LButtonSprite getCurrentSprite();
+
+	//Gets button state
+	int getState();
 
 private:
 	//Position

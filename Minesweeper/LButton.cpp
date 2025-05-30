@@ -27,24 +27,26 @@ void LButton::setPressed(bool newPressed) {
 	pressed = newPressed;
 }
 
-void LButton::handleEvent(SDL_Event* e) {
+int LButton::handleEvent(SDL_Event* e) {
 	//Only called when mouse is pressed
 	if (e->type == SDL_MOUSEBUTTONDOWN) {
 		// Ignore if the button is pressed before
-		if (pressed) return;
+		if (pressed) return 2;
 
 		// If left mouse button is pressed
 		if (e->button.button == SDL_BUTTON_LEFT) {
 			if (mCurrentSprite == BUTTON_SPRITE_DEFAULT) {
 				if (state == -1) {
 					mCurrentSprite = BUTTON_SPRITE_EXPLOSION;
+					return -1;
 				}
 				else {
 					mCurrentSprite = (LButtonSprite)state;
+					return state == 0; // If state is 0, return 1 to spread the zero
 				}
 			}
 			else {
-				return; // Ignore if the button is flagged 
+				return 2; // Ignore if the button is flagged 
 			}
 		}
 		// If right mouse button is pressed
@@ -55,7 +57,11 @@ void LButton::handleEvent(SDL_Event* e) {
 			else if (mCurrentSprite == BUTTON_SPRITE_FLAG) {
 				mCurrentSprite = BUTTON_SPRITE_DEFAULT;
 			}
+			return 3;
 		}
+	}
+	else {
+		return -999;
 	}
 }
 
@@ -65,4 +71,8 @@ SDL_Point LButton::getPosition() {
 
 LButtonSprite LButton::getCurrentSprite() {
 	return mCurrentSprite;
+}
+
+int LButton::getState() {
+	return state;
 }
