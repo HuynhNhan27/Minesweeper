@@ -7,8 +7,8 @@ Maker::Maker(int width, int height, int bombs) {
 	mWindow.GAME_HEIGHT = height;
 	mWindow.BOMBS = bombs;
 	mWindow.TOTAL_BUTTONS = width * height;
-	mWindow.SCREEN_WIDTH = width * CELL_SIZE + 24; // 12px padding on each side
-	mWindow.SCREEN_HEIGHT = height * CELL_SIZE + 68; // 57px for the top bar
+	mWindow.SCREEN_WIDTH = width * CELL_SIZE + 24;
+	mWindow.SCREEN_HEIGHT = height * CELL_SIZE + 68;
 }
 Maker::~Maker() { }
 
@@ -129,6 +129,9 @@ bool Maker::loadMedia() {
 		gSpriteClips[53].h = TIMER_WINDOW_HEIGHT;
 	}
 
+	// Set face position
+	background[12].setPosition(mWindow.SCREEN_WIDTH / 2 - 13, 16);
+
 	return success;
 }
 
@@ -177,8 +180,7 @@ bool Maker::renderBackground() {
 	}
 
 	// Render the face button
-	background[12].setPosition(mWindow.SCREEN_WIDTH / 2 - 13, 16);
-	gButtonSpriteSheetTexture.render(background[12].getPosition(), &gSpriteClips[31]);
+	gButtonSpriteSheetTexture.render(background[12].getPosition(), &gSpriteClips[background[12].getCurrentSprite()]);
 
 	return true;
 }
@@ -262,8 +264,9 @@ void Maker::run() {
 			if (x >= background[12].getPosition().x && x < background[12].getPosition().x + FACE_WIDTH &&
 				y >= background[12].getPosition().y && y < background[12].getPosition().y + FACE_HEIGHT) {
 				start_game(); // Restart the game if face button is clicked
+				event = 0;
 			}
-			else {
+			else if (event != -1) {
 				x = (x - 12) / CELL_SIZE;
 				y = (y - 57) / CELL_SIZE;
 				if (x >= 0 && y >= 0 && x < mWindow.GAME_WIDTH && y < mWindow.GAME_HEIGHT) {
@@ -331,6 +334,8 @@ void Maker::generateGame() {
 	}
 
 	win_condition = mWindow.TOTAL_BUTTONS - mWindow.BOMBS;
+	// Reset the face button to default state
+	background[12].setCurrentSprite(BUTTON_SPRITE_FACE);
 
 	// Initialize positions of buttons
 	for (int i = 0; i < mWindow.GAME_HEIGHT; ++i) {
@@ -399,6 +404,7 @@ void Maker::lose_game() {
 			}
 		}
 	}
+	background[12].setCurrentSprite(BUTTON_SPRITE_LOSE_FACE);
 	renderAll();
 }
 
@@ -411,5 +417,5 @@ void Maker::win_game() {
 			}
 		}
 	}
-	//renderAll();
+	background[12].setCurrentSprite(BUTTON_SPRITE_WIN_FACE);
 }
